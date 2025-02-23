@@ -1,0 +1,108 @@
+/* General Styles */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f4f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    max-width: 500px;
+    width: 100%;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #ff7e5f;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #feb47b;
+}
+
+.extra-links a {
+    text-decoration: none;
+    color: #ff7e5f;
+}
+
+.extra-links a:hover {
+    color: #feb47b;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+/* Popup styles */
+.popup {
+    display: none; /* Initially hidden */
+    position: fixed; /* Fixed position */
+    /* left: 0;
+    top: 0; */
+    width: 250px; /* Full width */
+    height: 250px; /* Full height */
+    background-color: rgba(114, 111, 111, 0.5); /* Semi-transparent background */
+    z-index: 1000; /* On top of other elements */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+/* Popup content styles */
+.popup-content {
+    background-color:wheat; /* White background for the popup */
+    padding: 20px; /* Padding inside the popup */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+    max-width: 400px; /* Max width of the popup */
+    width: 90%; /* Responsive width */
+    text-align: center; /* Center text */
+    /* display: none; */
+}
+
+/* Close button styles */
+.close-button {
+    background-color: #44e823; /* Red background */
+    color: rgb(29, 28, 2); /* White text */
+    border: none; /* No border */
+    padding: 10px 15px; /* Padding */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+    margin-top: 10px; /* Margin above the button */
+}
+
+.close-button:hover {
+    background-color: #ed7e34; /* Darker red on hover */
+}
+.logout_button{
+    margin-left: 85%;
+    top: 10px;
+}
+#user-Id{
+    color: black;
+    font-size: 10px;
+    top: 5px;
+
+}

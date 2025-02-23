@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Order Page</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="/home.css">
+    <style>
+        body{
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome to Cloud Kitchen</h1>
+        <nav>
+            <ul>
+                <!-- <li><a href="#menu">Menu</a></li> -->
+                <li><a href="/About">About Us</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li id="user-id" style="display: none;">
+                    <h3><span id="userIdDisplay"></span></h3>
+                </li>
+                <li id="nav" style="margin-left: 80%;position: absolute;">
+                    <ul>
+                        <li id="login-register-buttons">
+                            <button class="login_button">Login</button>
+                            <button class="register_button">Register</button>
+                        </li>
+                        <li id="logout-button" style="display: none;">
+                            <button class="logout_button">Logout</button>
+                        </li>
+                        
+                    </ul>
+                </li>     
+            </ul>
+           
+        </nav>
+    </header>
+    
+    <h2 >Our Menu</h2>
+<div class="food_item_container">
+    
+    <section id="menu">
+        
+        <div id="item1">
+            <img src="kochori.jpeg"alt="",widht="100%",height="150px">
+            <div class="menu-item" id="kochori" data-item="Kochori" data-price="12.99">
+                <h3>Kochori</h3>
+                <h4>Rs-60</h4>
+                <button onclick="addToOrder('Kochori',60)">Add Order</button>
+                <!-- <button >Add To chart</button> -->
+            </div>
+        </div>
+        <div id="item2">
+            <img src="biriyani.jpeg"alt="",widht="100%",height="150px">
+            <div class="menu-item" id="Biriyani" data-item="Biriyani" data-price="8.99">
+                <h3>Biriyani</h3>
+                <h4>Rs-150</h4>
+                <button onclick="addToOrder('Biriyani', 150)">Add Order</button>
+            </div>
+        </div>
+        <div id="item3">
+            <img src="pizza.jpeg"alt="",widht="100%",height="150px">
+            <div class="menu-item" id="pizza" data-item="pizza" data-price="10.99">
+                <h3>Pizza</h3>
+                <h4>Rs-350</h4>
+                <button onclick="addToOrder('pizza',350)">Add Order</button>
+            </div>
+        </div>
+        <div id="item4">
+            <img src="thali.jpeg"alt="",widht="100%",height="150px">
+            <div class="menu-item" id="thali" data-item="thali" data-price="10.99">
+                <h3>Non veg Thali</h3>
+                <h4>Rs 290</h4>
+                <button onclick="addToOrder('Non veg', 290)">Add Order</button>
+            </div>
+        </div>
+        <div id="item5">
+            <img src="Frid rice.jpeg" alt="",widht="100%",height="150px">
+            <div class="menu-item" id="Fried_rice" data-item="Fried rice" data-price="10.99">
+                <h3>Fried rice</h3>
+                <h4>Rs-210</h4>
+                <button onclick="addToOrder('Fried Rice', 210)">Add Order</button>
+            </div>
+        </div>
+        <div id="item6">
+            <img src="south.jpeg"alt="",widht="100%",height="150px">
+            <div class="menu-item" id="south" data-item="south" data-price="10.99">
+                <h3>South indian</h3>
+                <h4>Rs-180</h4>
+                <button onclick="addToOrder('South Indian', 180)">Add Order</button>
+            </div>
+        </div>
+        
+    </section>
+</div>
+
+<div id="successModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Order Placed Successfully!</h2>
+        <p>Your order has been placed successfully. Thank you for your order!</p>
+    </div>
+</div>
+<section id="order-summary">
+    <h2>Order Summary</h2>
+    <ul id="order-list"></ul>
+    <p >Total:<span id="total_price"></span></p>
+    <button id="Place_order">Place Order</button>
+
+        <!-- <section class="specialties">
+            <h2>Our Specialties</h2>
+            <div class="dish">
+                <h3>Dish Name 1</h3>
+                <p>Description of dish 1. It's a delicious blend of flavors that will leave you wanting more!</p>
+            </div>
+            <div class="dish">
+                <h3>Dish Name 2</h3>
+                <p>Description of dish 2. A perfect choice for any occasion, guaranteed to impress your taste buds.</p>
+            </div>
+        </section> -->
+        <section class="location">
+            <h2>Find Us</h2>
+            <p>Address: 123 Food Street, Flavor Town</p>
+            <p>Phone: (123) 456-7890</p>
+            <p>Email: contact@restaurant.com</p>
+    
+<footer>
+    <p>&copy; 2024 Foodie's Paradise. All rights reserved.</p>
+</footer>
+<script src="script.js"></script>
+</body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Check if the user is logged in
+        $.get('/api/check-login', function(data) {
+            if (data.loggedIn) {
+                // User is logged in, show logout button and user ID
+                $('#login-register-buttons').hide();
+                $('#logout-button').show();
+                $('#user-id').show();
+                $('#userIdDisplay').text(data.userId); // Display the user ID
+            } else {
+                // User is not logged in, show login and register buttons
+                $('#login-register-buttons').show();
+                $('#logout-button').hide();
+                $('#user-id').hide();
+            }
+        });
+
+        // Logout button functionality
+        $('.logout_button').click(function() {
+            // Redirect to the logout route
+            window.location.href = '/logout';
+        });
+
+        // Login and Register button functionality
+        $('.login_button').click(function() {
+            window.location.href = '/login';
+        });
+
+        $('.register_button').click(function() {
+            window.location.href = '/register';
+        });
+    });
+    // $(document).ready(function() {
+    //     // Add item to order
+
+        
+    // })
+    function addToOrder(item, price) {
+        // Add the item to the order list
+        var orderList = $('#order-list');
+        var orderItem = $('<li>');
+        orderItem.text(item +'($' + price + ')');
+        orderList.append(orderItem);
+        // Get the current total price, or initialize it to 0 if it's empty
+        var currentTotal = parseFloat($('#total_price').text()) || 0;
+    
+         // Update the total price
+         currentTotal += price;
+    
+         // Display the updated total price
+         $('#total_price').text(currentTotal);
+    }
+    // $(document).ready(function() {
+    // Existing code...
+
+
+    //placing order 
+    $(document).ready(function() {
+    // Place Order button functionality
+    $('#Place_order').click(function() {
+        // Collect order items
+        var orderItems = [];
+        $('#order-list li').each(function() {
+            orderItems.push($(this).text());
+        });
+
+        // Get the total price
+        var totalPrice = parseFloat($('#total_price').text()) || 0; // Ensure it's a number
+
+        // Prepare the data to send to the server
+        var orderData = {
+            items: orderItems,
+            total: totalPrice
+        };
+
+        // Send the order data to the server
+        $.post('/api/place-order', orderData, function(response) {
+            // Handle the response from the server
+            if (response.success) {
+                // Show the success modal
+                $('#successModal').css('display', 'block');
+                // Optionally, clear the order summary
+                $('#order-list').empty();
+                $('#total_price').text('0');
+            } else {
+                alert('There was an error placing your order: ' + response.message);
+            }
+        }).fail(function(jqXHR, textStatus, errorThrown) {
+            alert('Failed to connect to the server. Please try again later. Error: ' + textStatus);
+        });
+    });
+
+    // Close the modal when the user clicks on <span> (x)
+    $('.close').click(function() {
+        $('#successModal').css('display', 'none');
+    });
+});
+// Close the modal when the user clicks on <span> (x)
+$('.close').click(function() {
+    $('#successModal').css('display', 'none');
+    });
+</script>
+</html>
