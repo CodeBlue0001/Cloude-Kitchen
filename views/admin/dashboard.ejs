@@ -1,0 +1,120 @@
+<%- include('../partials/header') %>
+
+<div style="max-width: 1240px; margin: 2rem auto 4rem; padding: 0 1.5rem; flex: 1;">
+    <!-- Admin Top Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h1 style="font-size: 2.2rem; margin-bottom: 0.3rem;">Kitchen Admin Portal 👨‍🍳</h1>
+            <p style="color: var(--text-muted);">Real-time operations dashboard, orders dispatch, and menu control.</p>
+        </div>
+
+        <div style="display: flex; gap: 0.8rem;">
+            <a href="/admin/orders" class="btn btn-primary btn-sm">Manage All Orders 📦</a>
+            <a href="/admin/menu" class="btn btn-secondary btn-sm">Menu Management 🍔</a>
+            <a href="/admin/feedback" class="btn btn-secondary btn-sm">Customer Inquiries ✉️</a>
+        </div>
+    </div>
+
+    <!-- STATS CARDS -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+        <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Total Revenue</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #16A34A; margin-top: 0.3rem;">₹<%= stats.totalRevenue %></div>
+            <div style="font-size: 0.8rem; color: #16A34A; margin-top: 0.3rem;">From completed orders</div>
+        </div>
+
+        <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Active Kitchen Orders</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--primary); margin-top: 0.3rem;"><%= stats.pendingOrders %></div>
+            <div style="font-size: 0.8rem; color: var(--primary); margin-top: 0.3rem;">Placed / Preparing / Out for Delivery</div>
+        </div>
+
+        <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Completed Orders</div>
+            <div style="font-size: 2rem; font-weight: 800; color: #3B82F6; margin-top: 0.3rem;"><%= stats.deliveredOrders %></div>
+            <div style="font-size: 0.8rem; color: #3B82F6; margin-top: 0.3rem;">Delivered successfully</div>
+        </div>
+
+        <div style="background: #fff; padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Registered Customers</div>
+            <div style="font-size: 2rem; font-weight: 800; color: var(--secondary); margin-top: 0.3rem;"><%= stats.totalCustomers %></div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">Active users in database</div>
+        </div>
+    </div>
+
+    <!-- RECENT ORDERS TABLE -->
+    <div style="background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); padding: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="font-size: 1.3rem;">Recent Kitchen Orders</h3>
+            <a href="/admin/orders" style="color: var(--primary); font-weight: 700; font-size: 0.9rem;">View All Orders →</a>
+        </div>
+
+        <% if (!recentOrders || recentOrders.length === 0) { %>
+            <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No orders placed yet.</p>
+        <% } else { %>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+                            <th style="padding: 0.8rem;">Order ID</th>
+                            <th style="padding: 0.8rem;">Customer</th>
+                            <th style="padding: 0.8rem;">Items</th>
+                            <th style="padding: 0.8rem;">Total Amount</th>
+                            <th style="padding: 0.8rem;">Status</th>
+                            <th style="padding: 0.8rem;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% recentOrders.forEach(function(ord) { %>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 0.9rem; font-weight: 700; color: var(--secondary);">#<%= ord.orderId %></td>
+                                <td style="padding: 0.9rem;">
+                                    <div><%= ord.customerName %></div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);"><%= ord.customerPhone %></div>
+                                </td>
+                                <td style="padding: 0.9rem;">
+                                    <%= ord.items.map(i => `${i.name} (x${i.quantity})`).join(', ') %>
+                                </td>
+                                <td style="padding: 0.9rem; font-weight: 800; color: var(--primary);">₹<%= ord.totalAmount %></td>
+                                <td style="padding: 0.9rem;">
+                                    <select onchange="updateStatus('<%= ord.orderId %>', this.value)" style="padding: 0.3rem 0.6rem; border-radius: 8px; border: 1px solid var(--border-color); font-weight: 600; font-size: 0.85rem;">
+                                        <option value="Placed" <%= ord.orderStatus === 'Placed' ? 'selected' : '' %>>Placed</option>
+                                        <option value="Preparing" <%= ord.orderStatus === 'Preparing' ? 'selected' : '' %>>Preparing</option>
+                                        <option value="Out for Delivery" <%= ord.orderStatus === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                                        <option value="Delivered" <%= ord.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                        <option value="Cancelled" <%= ord.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                    </select>
+                                </td>
+                                <td style="padding: 0.9rem;">
+                                    <a href="/track-order/<%= ord.orderId %>" class="btn btn-secondary btn-sm" target="_blank">View 📍</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+async function updateStatus(orderId, newStatus) {
+    try {
+        const res = await fetch(`/admin/order/${orderId}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message);
+        } else {
+            showToast('Failed to update status.');
+        }
+    } catch (e) {
+        showToast('Error updating status.');
+    }
+}
+</script>

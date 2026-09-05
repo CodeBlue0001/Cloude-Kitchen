@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+
+<div class="auth-wrapper">
+    <div class="auth-card" style="text-align: center; max-width: 550px;">
+        <span style="font-size: 4rem;">🍳</span>
+        <h2 style="font-size: 2.2rem; margin: 1rem 0 0.5rem;"><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Error' %></h2>
+        <p style="color: var(--text-muted); font-size: 1.05rem; margin-bottom: 2rem;">
+            <%= typeof message !== 'undefined' ? message : 'Something went wrong.' %>
+        </p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="/" class="btn btn-primary">Back to Menu 🍽️</a>
+            <a href="/contact" class="btn btn-secondary">Contact Support 📞</a>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>

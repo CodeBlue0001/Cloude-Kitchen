@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof pageTitle !== 'undefined' ? pageTitle : 'Cloud Kitchen - Smart Food Delivery' %></title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22><text y=%2224%22 font-size=%2224%22>🍲</text></svg>">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <span>🍲</span> Cloud<span>Kitchen</span>
+            </a>
+
+            <ul class="nav-links">
+                <li><a href="/" class="nav-link <%= typeof currentPath !== 'undefined' && currentPath === '/' ? 'active' : '' %>">Menu</a></li>
+                <li><a href="/about" class="nav-link <%= typeof currentPath !== 'undefined' && currentPath === '/about' ? 'active' : '' %>">About Us</a></li>
+                <li><a href="/contact" class="nav-link <%= typeof currentPath !== 'undefined' && currentPath === '/contact' ? 'active' : '' %>">Contact</a></li>
+                
+                <% if (currentUser) { %>
+                    <li><a href="/my-orders" class="nav-link <%= typeof currentPath !== 'undefined' && currentPath === '/my-orders' ? 'active' : '' %>">My Orders</a></li>
+                    <% if (currentUser.role === 'admin') { %>
+                        <li><a href="/admin" class="btn btn-admin btn-sm">Admin Dashboard</a></li>
+                    <% } %>
+                <% } %>
+            </ul>
+
+            <div class="nav-actions">
+                <!-- Cart Trigger Button -->
+                <button class="cart-btn" onclick="openCart()">
+                    <span>🛒</span> Cart
+                    <span class="cart-badge" id="cart-badge">0</span>
+                </button>
+
+                <% if (currentUser) { %>
+                    <div style="display: flex; align-items: center; gap: 0.8rem;">
+                        <a href="/profile" style="font-weight: 700; font-size: 0.9rem; color: var(--secondary); background: #f1f5f9; padding: 0.5rem 0.9rem; border-radius: 30px; display: flex; align-items: center; gap: 0.4rem;">
+                            <span>👤</span> <%= currentUser.firstName || currentUser.name %>
+                        </a>
+                        <a href="/logout" class="btn btn-secondary btn-sm" title="Logout">Logout</a>
+                    </div>
+                <% } else { %>
+                    <a href="/login" class="btn btn-outline btn-sm">Login</a>
+                    <a href="/register" class="btn btn-primary btn-sm">Register</a>
+                <% } %>
+            </div>
+        </div>
+    </header>
+
+    <!-- Slide-in Cart Drawer -->
+    <div class="cart-overlay" id="cart-overlay"></div>
+    <div class="cart-drawer" id="cart-drawer">
+        <div class="cart-header">
+            <h3>Your Order Tray 🛍️</h3>
+            <button class="cart-close-btn" onclick="closeCart()">&times;</button>
+        </div>
+
+        <div class="cart-body" id="cart-items-list">
+            <!-- Rendered by cart.js -->
+        </div>
+
+        <div class="cart-footer">
+            <div class="coupon-box">
+                <input type="text" id="coupon-input" placeholder="Promo code (e.g. COLLEGE50)">
+                <button class="btn btn-secondary btn-sm" onclick="applyCoupon()">Apply</button>
+            </div>
+
+            <div class="bill-row">
+                <span>Subtotal</span>
+                <span id="cart-subtotal">₹0</span>
+            </div>
+            <div class="bill-row" style="color: #16A34A;">
+                <span>Discount</span>
+                <span id="cart-discount">₹0</span>
+            </div>
+            <div class="bill-row">
+                <span>Delivery Partner Fee</span>
+                <span id="cart-delivery">₹0</span>
+            </div>
+            <div class="bill-row">
+                <span>Taxes & GST (5%)</span>
+                <span id="cart-tax">₹0</span>
+            </div>
+            <div class="bill-row total">
+                <span>Total Payable</span>
+                <span id="cart-total" style="color: var(--primary);">₹0</span>
+            </div>
+
+            <button class="btn btn-primary" id="checkout-btn" style="width: 100%; margin-top: 1rem; padding: 0.85rem;" onclick="openCheckoutModal()">
+                Proceed to Checkout 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal Dialog -->
+    <div id="checkoutModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); backdrop-filter: blur(5px); z-index: 3000; align-items: center; justify-content: center; padding: 1.5rem;">
+        <div style="background: #fff; width: 100%; max-width: 520px; border-radius: var(--radius-lg); padding: 2rem; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.3);">
+            <button onclick="closeCheckoutModal()" style="position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            
+            <h3 style="font-size: 1.5rem; margin-bottom: 0.4rem;">Confirm Delivery Details 🛵</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">We'll prepare and deliver your freshly cooked food promptly.</p>
+
+            <div class="form-group">
+                <label>Delivery Address *</label>
+                <textarea id="checkout-address" class="form-control" rows="3" placeholder="Enter complete flat/house no, street, landmark, area" required><%= currentUser && currentUser.address ? currentUser.address : '' %></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Cooking & Delivery Instructions (Optional)</label>
+                <input type="text" id="checkout-notes" class="form-control" placeholder="e.g. Less spicy, call before delivery">
+            </div>
+
+            <div class="form-group">
+                <label>Payment Method</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.4rem;">
+                    <label style="border: 1px solid var(--border-color); padding: 0.8rem; border-radius: var(--radius-md); display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
+                        <input type="radio" name="paymentMethod" value="COD" checked> 💵 Cash on Delivery
+                    </label>
+                    <label style="border: 1px solid var(--border-color); padding: 0.8rem; border-radius: var(--radius-md); display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
+                        <input type="radio" name="paymentMethod" value="UPI"> 📱 UPI / Online
+                    </label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.8rem;">
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeCheckoutModal()">Cancel</button>
+                <button type="button" id="submit-order-btn" class="btn btn-primary" style="flex: 2;" onclick="submitOrder()">Confirm & Place Order</button>
+            </div>
+        </div>
+    </div>

@@ -1,0 +1,93 @@
+<%- include('partials/header') %>
+
+<div style="max-width: 800px; margin: 3rem auto 4rem; padding: 0 1.5rem; flex: 1;">
+    <div class="auth-card" style="max-width: 100%; padding: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 2rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800;">
+                    <%= user.firstName.charAt(0) %>
+                </div>
+                <div>
+                    <h2 style="font-size: 1.6rem; margin-bottom: 0.2rem;"><%= user.firstName %> <%= user.lastName %></h2>
+                    <span style="background: #EFF6FF; color: #3B82F6; padding: 0.2rem 0.6rem; border-radius: 12px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">
+                        <%= user.role %> Account
+                    </span>
+                </div>
+            </div>
+
+            <a href="/my-orders" class="btn btn-outline btn-sm">View Orders 📦</a>
+        </div>
+
+        <form id="profileForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" class="form-control" value="<%= user.firstName %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" class="form-control" value="<%= user.lastName %>" required>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem;">
+                <div class="form-group">
+                    <label for="email">Email Address (Read-only)</label>
+                    <input type="email" id="email" class="form-control" value="<%= user.email %>" disabled style="background: #F8FAFC;">
+                </div>
+                <div class="form-group">
+                    <label for="mobileNumber">Mobile Number</label>
+                    <input type="tel" id="mobileNumber" class="form-control" value="<%= user.mobileNumber %>" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="homeAddress">Default Delivery Address</label>
+                <textarea id="homeAddress" class="form-control" rows="3" required><%= user.homeAddress %></textarea>
+            </div>
+
+            <button type="submit" id="saveProfileBtn" class="btn btn-primary" style="margin-top: 1rem; padding: 0.8rem 2rem;">
+                Save Profile Changes 💾
+            </button>
+        </form>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script>
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const mobileNumber = document.getElementById('mobileNumber').value.trim();
+    const homeAddress = document.getElementById('homeAddress').value.trim();
+    const btn = document.getElementById('saveProfileBtn');
+
+    btn.disabled = true;
+    btn.innerText = 'Saving... ⏳';
+
+    try {
+        const res = await fetch('/profile/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ firstName, lastName, mobileNumber, homeAddress })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            showToast('Profile updated successfully! ✅');
+            btn.disabled = false;
+            btn.innerText = 'Save Profile Changes 💾';
+        } else {
+            showToast(data.message || 'Failed to update profile.');
+            btn.disabled = false;
+            btn.innerText = 'Save Profile Changes 💾';
+        }
+    } catch (err) {
+        showToast('Error updating profile.');
+        btn.disabled = false;
+        btn.innerText = 'Save Profile Changes 💾';
+    }
+});
+</script>

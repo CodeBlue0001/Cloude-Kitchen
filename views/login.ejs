@@ -1,94 +1,92 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Cloud Kitchen</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="popup" id="myPopup">
-        <div class="popup-content">
-            <h2>Popup Title</h2>
-            <p id="message"></p>
-            <button class="close-button" id="closePopup">Close</button>
-        </div>
-    </div>
-    <div class="login-container">
-        <div class="login-form">
-            <h1>Login</h1>
-            <form id="login-form">
-                <div class="input-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="email" name="email" placeholder="Enter your username" required>
-                </div>
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                </div>
-                <button type="submit" class="login-button">Login</button>
-                <div class="extra-links">
-                    <a href="forgot-password.html">Forgot Password?</a>
-                    <a href="/register">Create an account</a>
-                </div>
-            </form>
-            
-        </div>
-    </div>
-    <!-- <script src="script.js"></script> -->
-</body>
-<script>
-    document.getElementById("login-form").addEventListener("submit", async function (event) {
-    event.preventDefault(); // Prevent the default form submission
+<%- include('partials/header') %>
 
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Welcome Back! 🍲</h2>
+            <p>Login to your Cloud Kitchen account to order and track food.</p>
+        </div>
+
+        <!-- Demo Credentials Helper for College Viva & Review -->
+        <div class="demo-credentials">
+            <div style="font-weight: 700; margin-bottom: 0.3rem;">💡 Quick Demo Logins:</div>
+            <div style="display: flex; gap: 0.5rem; margin-top: 0.4rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('john@example.com', 'user123')">👤 Demo Customer</button>
+                <button type="button" class="btn btn-admin btn-sm" onclick="fillDemo('admin@cloudkitchen.com', 'admin123')">🛠️ Demo Admin</button>
+            </div>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <label for="password" style="margin-bottom: 0;">Password</label>
+                    <a href="/forgot-password" style="font-size: 0.8rem; color: var(--primary); font-weight: 600;">Forgot Password?</a>
+                </div>
+                <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" id="loginSubmitBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.8rem; padding: 0.8rem;">
+                Login to Account 🚀
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+            Don't have an account? <a href="/register" style="color: var(--primary); font-weight: 700;">Create Account</a>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script>
+function fillDemo(email, pass) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = pass;
+    showToast(`Filled credentials for ${email}`);
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const btn = document.getElementById('loginSubmitBtn');
+
+    btn.disabled = true;
+    btn.innerText = 'Verifying... ⏳';
 
     try {
-        const response = await fetch("/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+        const res = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
 
-        const data = await response.json(); // Parse the JSON response
+        const data = await res.json();
 
-        if (response.ok) {
-            // console.log("Login successful"); // Log success message to console
-            // alert(data.message); // Optionally show an alert with the message
-            document.getElementById("myPopup").style.display = "block";
-            document.getElementById('message').innerHTML = data.message;
-            console.log(data.message)
+        if (res.ok && data.success) {
+            showToast(data.message);
             setTimeout(() => {
-                window.location.href = "/home"; // Redirect to the about page
-            }, 3000);
-            // const token = data.token; // Adjust this based on your actual response structure
-
-            // Option 1: Redirect to the home page with the token as a query parameter
-            // window.location.href = `/home?token=${encodeURIComponent(token)}`;
-
-// Option 2: Store the token in session storage and redirect
-            
-            
-
-// window.location.href = '/home';
-         // Log success message to console
-            // Redirect to the about page after 3 seconds
-             // 3000 milliseconds = 3 seconds
+                if (data.user && data.user.role === 'admin') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/';
+                }
+            }, 1000);
         } else {
-            console.error(data.message); // Log error message to console
-            alert(data.message); // Show error message to the user
+            showToast(data.message || 'Login failed.');
+            btn.disabled = false;
+            btn.innerText = 'Login to Account 🚀';
         }
-    } catch (error) {
-        console.error("Error during login:", error); // Log any errors
-        alert("An error occurred during login. Please try again.");
+    } catch (err) {
+        console.error(err);
+        showToast('Connection error during login.');
+        btn.disabled = false;
+        btn.innerText = 'Login to Account 🚀';
     }
 });
-$(document).ready(function(){
-    $(".close-button").click(function(){
-        $("#myPopup").hide();
-    });
- });
-
 </script>
-</html>

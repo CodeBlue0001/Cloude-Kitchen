@@ -1,58 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | Cloud Kitchen</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="popup" id="myPopup">
-        <div class="popup-content">
-            <h2>Popup Title</h2>
-            <p id="message"></p>
-            <button class="close-button" id="closePopup">Close</button>
+<%- include('partials/header') %>
+
+<div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 540px;">
+        <div class="auth-header">
+            <h2>Create Your Account 🥗</h2>
+            <p>Join Cloud Kitchen to order delicious meals and enjoy fast doorstep delivery.</p>
+        </div>
+
+        <form id="registerForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" id="firstName" class="form-control" placeholder="John" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" id="lastName" class="form-control" placeholder="Doe" required>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" class="form-control" placeholder="john@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="mobileNumber">Mobile Number *</label>
+                    <input type="tel" id="mobileNumber" class="form-control" placeholder="9876543210" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="homeAddress">Primary Delivery Address *</label>
+                <textarea id="homeAddress" class="form-control" rows="2" placeholder="House/Flat No, Landmark, Street, City" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password (Minimum 6 characters) *</label>
+                <input type="password" id="password" class="form-control" placeholder="••••••••" minlength="6" required>
+            </div>
+
+            <button type="submit" id="regSubmitBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.8rem; padding: 0.8rem;">
+                Register Account 🍕
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+            Already have an account? <a href="/login" style="color: var(--primary); font-weight: 700;">Login here</a>
         </div>
     </div>
-    <div class="register-container">
-       
-        <div class="register-form">
-            <h1>Create Account</h1>
-            <form id="register-form">
-                <div class="input-group">
-                    <label for="firstName">First Name</label>
-                    <input type="text" id="firstName" placeholder="Enter your first name" required>
-                </div>
-                <div class="input-group">
-                    <label for="lastName">Last Name</label>
-                    <input type="text" id="lastName" placeholder="Enter your last name" required>
-                </div>
-                <div class="input-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" placeholder="Enter your email" required>
-                </div>
-                <div class="input-group">
-                    <label for="mobileNumber">Mobile Number</label>
-                    <input type="text" id="mobileNumber" placeholder="Enter your mobile number" required>
-                </div>
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="Enter your password" required>
-                </div>
-                <div class="input-group">
-                    <label for="home-address">Home-address</label>
-                    <input type="text" id="address" placeholder="Enter your local area address" required>
-                </div>
-                <button type="submit" class="register-button">Register</button>
-            </form>
-        </div>
-    </div>
-    
-    
-    <script src="script.js"></script>
-</body>
+</div>
+
+<%- include('partials/footer') %>
+
 <script>
-    
-    
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const mobileNumber = document.getElementById('mobileNumber').value.trim();
+    const homeAddress = document.getElementById('homeAddress').value.trim();
+    const password = document.getElementById('password').value;
+
+    const btn = document.getElementById('regSubmitBtn');
+    btn.disabled = true;
+    btn.innerText = 'Creating Account... ⏳';
+
+    try {
+        const res = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                firstName,
+                lastName,
+                email,
+                mobileNumber,
+                homeAddress,
+                password
+            })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            showToast(data.message);
+            setTimeout(() => {
+                window.location.href = '/login';
+            }, 1200);
+        } else {
+            showToast(data.message || 'Registration failed.');
+            btn.disabled = false;
+            btn.innerText = 'Register Account 🍕';
+        }
+    } catch (err) {
+        console.error(err);
+        showToast('Connection error during registration.');
+        btn.disabled = false;
+        btn.innerText = 'Register Account 🍕';
+    }
+});
 </script>
-</html>

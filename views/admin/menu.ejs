@@ -1,0 +1,205 @@
+<%- include('../partials/header') %>
+
+<div style="max-width: 1240px; margin: 2rem auto 4rem; padding: 0 1.5rem; flex: 1;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="font-size: 0.9rem; color: var(--primary); font-weight: 700;">
+                <a href="/admin">← Back to Dashboard</a>
+            </div>
+            <h1 style="font-size: 2rem; margin-top: 0.3rem;">Menu & Dish Management 🍔</h1>
+        </div>
+
+        <button class="btn btn-primary" onclick="openAddFoodModal()">+ Add New Food Item</button>
+    </div>
+
+    <!-- FOOD ITEMS TABLE -->
+    <div style="background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); padding: 2rem;">
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+                        <th style="padding: 0.8rem;">Dish</th>
+                        <th style="padding: 0.8rem;">Category</th>
+                        <th style="padding: 0.8rem;">Type</th>
+                        <th style="padding: 0.8rem;">Price</th>
+                        <th style="padding: 0.8rem;">Stock Status</th>
+                        <th style="padding: 0.8rem;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% foods.forEach(function(food) { %>
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 0.9rem; display: flex; align-items: center; gap: 0.8rem;">
+                                <img src="<%= food.image %>" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover;" onerror="this.src='/images/biriyani.jpeg'">
+                                <div>
+                                    <div style="font-weight: 700; color: var(--secondary);"><%= food.name %></div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><%= food.description %></div>
+                                </div>
+                            </td>
+
+                            <td style="padding: 0.9rem; font-weight: 600;"><%= food.category %></td>
+
+                            <td style="padding: 0.9rem;">
+                                <span style="font-size: 0.8rem; font-weight: 700; color: <%= food.isVeg ? '#16A34A' : '#DC2626' %>;">
+                                    ● <%= food.isVeg ? 'Veg' : 'Non-Veg' %>
+                                </span>
+                            </td>
+
+                            <td style="padding: 0.9rem; font-weight: 800; color: var(--secondary);">₹<%= food.price %></td>
+
+                            <td style="padding: 0.9rem;">
+                                <button onclick="toggleAvailability('<%= food._id %>')" class="btn btn-sm <%= food.isAvailable ? 'btn-secondary' : 'btn-danger' %>" style="font-size: 0.8rem;">
+                                    <%= food.isAvailable ? '✅ In Stock' : '❌ Out of Stock' %>
+                                </button>
+                            </td>
+
+                            <td style="padding: 0.9rem;">
+                                <button onclick="deleteDish('<%= food._id %>', '<%= food.name.replace(/'/g, "\\'") %>')" class="btn btn-danger btn-sm" style="font-size: 0.8rem;">
+                                    Delete 🗑️
+                                </button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- ADD FOOD MODAL -->
+<div id="addFoodModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 3000; align-items: center; justify-content: center; padding: 1.5rem;">
+    <div style="background: #fff; width: 100%; max-width: 520px; border-radius: var(--radius-lg); padding: 2rem; position: relative;">
+        <button onclick="closeAddFoodModal()" style="position: absolute; top: 1.2rem; right: 1.2rem; background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+        
+        <h3 style="font-size: 1.4rem; margin-bottom: 1.5rem;">Add New Kitchen Dish 🍲</h3>
+
+        <form id="addFoodForm">
+            <div class="form-group">
+                <label>Dish Name *</label>
+                <input type="text" id="foodName" class="form-control" placeholder="e.g. Butter Chicken Masala" required>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="foodCategory" class="form-control" required>
+                        <% categories.forEach(function(c) { %>
+                            <option value="<%= c %>"><%= c %></option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Price (₹) *</label>
+                    <input type="number" id="foodPrice" class="form-control" placeholder="180" min="1" required>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Food Type</label>
+                    <select id="foodIsVeg" class="form-control">
+                        <option value="true">🌱 Pure Vegetarian</option>
+                        <option value="false">🍗 Non-Vegetarian</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Image Selection</label>
+                    <select id="foodImage" class="form-control">
+                        <option value="/images/biriyani.jpeg">Biryani Image</option>
+                        <option value="/images/pizza.jpeg">Pizza Image</option>
+                        <option value="/images/frid rice.jpeg">Fried Rice Image</option>
+                        <option value="/images/thali.jpeg">Thali Image</option>
+                        <option value="/images/kochori.jpeg">Kachori Image</option>
+                        <option value="/images/south.jpeg">South Indian Image</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="foodDesc" class="form-control" rows="2" placeholder="Ingredients, taste profile, and preparation style"></textarea>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeAddFoodModal()">Cancel</button>
+                <button type="submit" id="addDishBtn" class="btn btn-primary" style="flex: 2;">Save Dish to Menu 🚀</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+function openAddFoodModal() {
+    document.getElementById('addFoodModal').style.display = 'flex';
+}
+
+function closeAddFoodModal() {
+    document.getElementById('addFoodModal').style.display = 'none';
+}
+
+async function toggleAvailability(id) {
+    try {
+        const res = await fetch(`/admin/menu/${id}/toggle`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message);
+            setTimeout(() => location.reload(), 800);
+        }
+    } catch(e) {
+        showToast('Error toggling availability.');
+    }
+}
+
+async function deleteDish(id, name) {
+    if (!confirm(`Are you sure you want to delete "${name}" from the menu?`)) return;
+
+    try {
+        const res = await fetch(`/admin/menu/${id}/delete`, { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message);
+            setTimeout(() => location.reload(), 800);
+        }
+    } catch(e) {
+        showToast('Error deleting item.');
+    }
+}
+
+document.getElementById('addFoodForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('foodName').value.trim();
+    const category = document.getElementById('foodCategory').value;
+    const price = document.getElementById('foodPrice').value;
+    const isVeg = document.getElementById('foodIsVeg').value;
+    const image = document.getElementById('foodImage').value;
+    const description = document.getElementById('foodDesc').value.trim();
+
+    const btn = document.getElementById('addDishBtn');
+    btn.disabled = true;
+    btn.innerText = 'Saving...';
+
+    try {
+        const res = await fetch('/admin/menu/add', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, category, price, isVeg, image, description })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message);
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(data.message || 'Failed to add dish.');
+            btn.disabled = false;
+        }
+    } catch(err) {
+        showToast('Error adding dish.');
+        btn.disabled = false;
+    }
+});
+</script>

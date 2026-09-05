@@ -1,0 +1,123 @@
+<%- include('../partials/header') %>
+
+<div style="max-width: 1240px; margin: 2rem auto 4rem; padding: 0 1.5rem; flex: 1;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="font-size: 0.9rem; color: var(--primary); font-weight: 700;">
+                <a href="/admin">← Back to Dashboard</a>
+            </div>
+            <h1 style="font-size: 2rem; margin-top: 0.3rem;">Order Management Pipeline 📦</h1>
+        </div>
+
+        <!-- Filter by Status -->
+        <div style="display: flex; gap: 0.5rem; overflow-x: auto;">
+            <% ['All', 'Placed', 'Preparing', 'Out for Delivery', 'Delivered', 'Cancelled'].forEach(function(st) { %>
+                <a href="/admin/orders?status=<%= encodeURIComponent(st) %>" class="btn btn-sm <%= currentStatus === st ? 'btn-primary' : 'btn-secondary' %>">
+                    <%= st %>
+                </a>
+            <% }); %>
+        </div>
+    </div>
+
+    <div style="background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); padding: 2rem;">
+        <% if (!orders || orders.length === 0) { %>
+            <p style="color: var(--text-muted); text-align: center; padding: 3rem;">No orders found with status "<%= currentStatus %>".</p>
+        <% } else { %>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid var(--border-color); color: var(--text-muted);">
+                            <th style="padding: 0.8rem;">Order Details</th>
+                            <th style="padding: 0.8rem;">Customer & Contact</th>
+                            <th style="padding: 0.8rem;">Delivery Address</th>
+                            <th style="padding: 0.8rem;">Items Ordered</th>
+                            <th style="padding: 0.8rem;">Total Paid</th>
+                            <th style="padding: 0.8rem;">Order Status</th>
+                            <th style="padding: 0.8rem;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% orders.forEach(function(ord) { %>
+                            <tr style="border-bottom: 1px solid var(--border-color);">
+                                <td style="padding: 0.9rem;">
+                                    <div style="font-weight: 800; color: var(--secondary);">#<%= ord.orderId %></div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                        <%= new Date(ord.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) %>
+                                    </div>
+                                    <span style="font-size: 0.75rem; background: #F1F5F9; padding: 0.15rem 0.4rem; border-radius: 4px; margin-top: 0.2rem; display: inline-block;">
+                                        <%= ord.paymentMethod %> (<%= ord.paymentStatus %>)
+                                    </span>
+                                </td>
+
+                                <td style="padding: 0.9rem;">
+                                    <div style="font-weight: 700;"><%= ord.customerName %></div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);"><%= ord.customerPhone %></div>
+                                    <div style="font-size: 0.8rem; color: var(--text-muted);"><%= ord.customerEmail %></div>
+                                </td>
+
+                                <td style="padding: 0.9rem; max-width: 220px; font-size: 0.85rem; line-height: 1.4;">
+                                    <%= ord.deliveryAddress %>
+                                    <% if (ord.orderNotes) { %>
+                                        <div style="color: var(--primary); font-style: italic; font-size: 0.8rem; margin-top: 0.2rem;">
+                                            Note: "<%= ord.orderNotes %>"
+                                        </div>
+                                    <% } %>
+                                </td>
+
+                                <td style="padding: 0.9rem;">
+                                    <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                                        <% ord.items.forEach(function(it) { %>
+                                            <span style="font-size: 0.85rem;">• <%= it.name %> <strong>x<%= it.quantity %></strong></span>
+                                        <% }); %>
+                                    </div>
+                                </td>
+
+                                <td style="padding: 0.9rem; font-weight: 800; color: var(--primary); font-size: 1rem;">
+                                    ₹<%= ord.totalAmount %>
+                                </td>
+
+                                <td style="padding: 0.9rem;">
+                                    <select onchange="updateStatus('<%= ord.orderId %>', this.value)" style="padding: 0.4rem 0.7rem; border-radius: 8px; border: 1px solid var(--border-color); font-weight: 700; font-size: 0.85rem; background: #F8FAFC;">
+                                        <option value="Placed" <%= ord.orderStatus === 'Placed' ? 'selected' : '' %>>Placed</option>
+                                        <option value="Preparing" <%= ord.orderStatus === 'Preparing' ? 'selected' : '' %>>Preparing</option>
+                                        <option value="Out for Delivery" <%= ord.orderStatus === 'Out for Delivery' ? 'selected' : '' %>>Out for Delivery</option>
+                                        <option value="Delivered" <%= ord.orderStatus === 'Delivered' ? 'selected' : '' %>>Delivered</option>
+                                        <option value="Cancelled" <%= ord.orderStatus === 'Cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                    </select>
+                                </td>
+
+                                <td style="padding: 0.9rem;">
+                                    <a href="/track-order/<%= ord.orderId %>" class="btn btn-secondary btn-sm" target="_blank">
+                                        Track 📍
+                                    </a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>
+
+<script>
+async function updateStatus(orderId, newStatus) {
+    try {
+        const res = await fetch(`/admin/order/${orderId}/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message);
+        } else {
+            showToast('Failed to update status.');
+        }
+    } catch (e) {
+        showToast('Error updating status.');
+    }
+}
+</script>

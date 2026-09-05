@@ -1,22 +1,22 @@
-// // model/food.js
-// const mongoose = require('mongoose');
-
-// const orderSchema = new mongoose.Schema({
-//     consumer: { type: String, required: true },
-//     address: { type: String, required: true },
-//     number: { type: String, required: true },
-//     items: { type: [String], required: true }, // Array of item names
-//     total: { type: Number, required: true } // Total price
-// });
-
-// const Order = mongoose.model('Order', orderSchema);
-// module.exports = Order;
 const mongoose = require('mongoose');
 
-const orderSchema = new mongoose.Schema({
-    items: { type: [String], required: true }, // Array of item names
-    total: { type: Number, required: true } // Total price
+const foodSchema = new mongoose.Schema({
+    name: { type: String, required: true, trim: true },
+    category: { 
+        type: String, 
+        required: true, 
+        enum: ['Biryani & Rice', 'Fast Food', 'Main Course', 'Breakfast & Snacks', 'South Indian', 'Desserts & Drinks'],
+        default: 'Main Course'
+    },
+    price: { type: Number, required: true, min: 0 },
+    description: { type: String, trim: true },
+    image: { type: String, default: '/images/biriyani.jpeg' },
+    isVeg: { type: Boolean, default: true },
+    rating: { type: Number, default: 4.5 },
+    prepTime: { type: String, default: '20-30 min' },
+    isAvailable: { type: Boolean, default: true },
+    createdAt: { type: Date, default: Date.now }
 });
 
-const Order = mongoose.model('Order', orderSchema);
-module.exports = Order;
+const Food = mongoose.model('Food', foodSchema);
+module.exports = Food;

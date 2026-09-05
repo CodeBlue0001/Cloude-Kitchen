@@ -1,0 +1,142 @@
+<%- include('partials/header') %>
+
+<div style="max-width: 1100px; margin: 3rem auto 4rem; padding: 0 1.5rem; flex: 1;">
+    <div style="text-align: center; margin-bottom: 3rem;">
+        <h1 style="font-size: 2.4rem; margin-bottom: 0.5rem;">Contact & Kitchen Support 📞</h1>
+        <p style="color: var(--text-muted); font-size: 1.05rem;">Have questions about your order or catering? We'd love to hear from you.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; align-items: start;">
+        <!-- Contact Info Cards -->
+        <div>
+            <div style="background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); padding: 2rem; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 1.3rem; margin-bottom: 1.2rem;">Quick Assistance</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                            📞
+                        </div>
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Customer Helpline</div>
+                            <div style="font-weight: 700;">+91 98765 43210</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #EFF6FF; color: #3B82F6; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                            ✉️
+                        </div>
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Email Support</div>
+                            <div style="font-weight: 700;">orders@cloudkitchen.com</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <div style="width: 44px; height: 44px; border-radius: 50%; background: #F0FDF4; color: #16A34A; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                            📍
+                        </div>
+                        <div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Central Cloud Hub</div>
+                            <div style="font-weight: 700;">Tech Park Hub, Salt Lake, Sector V</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQs -->
+            <div style="background: #F8FAFC; border-radius: var(--radius-lg); border: 1px solid var(--border-color); padding: 1.8rem;">
+                <h4 style="font-size: 1.1rem; margin-bottom: 0.8rem;">Frequently Asked Questions</h4>
+                <div style="font-size: 0.9rem; margin-bottom: 0.8rem;">
+                    <strong>Q: How long does delivery take?</strong>
+                    <p style="color: var(--text-muted);">Orders are dispatched immediately and delivered within 25-35 minutes.</p>
+                </div>
+                <div style="font-size: 0.9rem;">
+                    <strong>Q: Can I cancel my order?</strong>
+                    <p style="color: var(--text-muted);">You can cancel directly from the live tracking screen while the order is in 'Placed' status.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Submission Form -->
+        <div style="background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--card-shadow); padding: 2.5rem;">
+            <h3 style="font-size: 1.4rem; margin-bottom: 0.4rem;">Send Us a Message ✉️</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">We reply to all customer inquiries within 1 business hour.</p>
+
+            <form id="contactForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="cName">Your Name *</label>
+                        <input type="text" id="cName" class="form-control" placeholder="John Doe" required value="<%= currentUser ? currentUser.name : '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="cEmail">Email Address *</label>
+                        <input type="email" id="cEmail" class="form-control" placeholder="john@example.com" required value="<%= currentUser ? currentUser.email : '' %>">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label for="cPhone">Phone Number</label>
+                        <input type="tel" id="cPhone" class="form-control" placeholder="9876543210" value="<%= currentUser && currentUser.mobile ? currentUser.mobile : '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="cSubject">Subject *</label>
+                        <input type="text" id="cSubject" class="form-control" placeholder="e.g. Order Inquiry / Feedback" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="cMessage">Your Message *</label>
+                    <textarea id="cMessage" class="form-control" rows="4" placeholder="How can we assist you?" required></textarea>
+                </div>
+
+                <button type="submit" id="contactBtn" class="btn btn-primary" style="width: 100%; padding: 0.85rem;">
+                    Submit Inquiry 🚀
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('partials/footer') %>
+
+<script>
+document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('cName').value.trim();
+    const email = document.getElementById('cEmail').value.trim();
+    const phone = document.getElementById('cPhone').value.trim();
+    const subject = document.getElementById('cSubject').value.trim();
+    const message = document.getElementById('cMessage').value.trim();
+    const btn = document.getElementById('contactBtn');
+
+    btn.disabled = true;
+    btn.innerText = 'Sending Message... ⏳';
+
+    try {
+        const res = await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, phone, subject, message })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message);
+            document.getElementById('contactForm').reset();
+            btn.disabled = false;
+            btn.innerText = 'Submit Inquiry 🚀';
+        } else {
+            showToast(data.message || 'Failed to send message.');
+            btn.disabled = false;
+            btn.innerText = 'Submit Inquiry 🚀';
+        }
+    } catch (err) {
+        showToast('Error sending message.');
+        btn.disabled = false;
+        btn.innerText = 'Submit Inquiry 🚀';
+    }
+});
+</script>

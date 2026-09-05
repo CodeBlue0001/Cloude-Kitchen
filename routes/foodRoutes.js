@@ -1,32 +1,26 @@
 const express = require('express');
-const Order = require('../model/food'); // Ensure this is the correct path to your Order model
 const router = express.Router();
+const foodController = require('../controller/foodController');
+const { isAuthenticated } = require('../middleware/auth');
 
-// Place Order API
-router.post('/api/place-order', async (req, res) => {
-    try {
-        const { items, total } = req.body;
+// Menu / Home Page
+router.get('/', foodController.getHome);
+router.get('/home', foodController.getHome);
+router.get('/menu', foodController.getHome);
 
-        // Validate the incoming data
-        if (!items || !total) {
-            return res.status(400).json({ success: false, message: 'Invalid order data' });
-        }
+// Foods API
+router.get('/api/foods', foodController.getFoodItemsApi);
 
-        // Create a new order
-        const newOrder = new Order({
-            items,
-            total
-        });
+// Order Placement API (Authenticated)
+router.post('/api/place-order', isAuthenticated, foodController.placeOrder);
 
-        // Save the order to the database
-        await newOrder.save();
+// Customer Orders History & Live Tracking
+router.get('/my-orders', isAuthenticated, foodController.getMyOrders);
+router.get('/orders', isAuthenticated, foodController.getMyOrders);
+router.get('/track-order/:orderId', foodController.trackOrder);
+router.get('/order/:orderId', foodController.trackOrder);
 
-        // Send a success response
-        res.json({ success: true, message: 'Order placed successfully!' });
-    } catch (error) {
-        console.error('Error placing order:', error);
-        res.status(500).json({ success: false, message: 'Failed to place order' });
-    }
-});
+// Cancel Order API
+router.post('/api/order/:orderId/cancel', isAuthenticated, foodController.cancelOrder);
 
 module.exports = router;
