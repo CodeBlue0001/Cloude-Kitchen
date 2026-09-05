@@ -1,20 +1,29 @@
 {
-  "name": "restapi_internship",
+  "name": "cloud-kitchen-management",
   "version": "1.0.0",
-  "main": "script.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "server": "node server.js",
     "dev": "node server.js",
     "seed": "node seed.js"
   },
-  "keywords": [],
+  "engines": {
+    "node": ">=18.x"
+  },
+  "keywords": [
+    "cloud-kitchen",
+    "food-delivery",
+    "express",
+    "mongodb",
+    "ejs",
+    "college-project"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Cloud Kitchen and Online Food Delivery Management System - Minor College Project",
   "dependencies": {
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.3",
     "body-parser": "^1.20.3",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
